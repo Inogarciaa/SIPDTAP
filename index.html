@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
+    <title>iTAPTAP MO — Tap Tap Game</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rubik:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+    <!-- Ambient background glow blobs -->
+    <div class="bg-glow bg-glow--blue"></div>
+    <div class="bg-glow bg-glow--blue-dark"></div>
+
+    <main class="app">
+
+        <!-- ============ HOME SCREEN ============ -->
+        <section id="homeScreen" class="screen screen--active">
+            <div class="card card--hero fade-in">
+                <!-- Integrated minimal topbar inside the card -->
+                <div class="card-topbar">
+                    <div class="logo">
+                        <span class="logo__text">iTAPTAP <span class="logo__accent">MO</span></span>
+                    </div>
+                </div>
+
+                <h1 class="hero-title">TAP AS FAST<br />AS YOU CAN</h1>
+                <p class="hero-sub"> Tap as much as possible to get a price!</p>
+
+                <div class="hero-stats">
+                    <div class="hero-stat">
+                        <span class="hero-stat__value" id="homeHighScore">0</span>
+                        <span class="hero-stat__label">High Score</span>
+                    </div>
+                </div>
+
+                <div class="hero-actions">
+                    <button id="startBtn" class="btn btn--primary btn--glow">START GAME</button>
+                    <button id="leaderboardBtn" class="btn btn--secondary">LEADERBOARD</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ COUNTDOWN SCREEN ============ -->
+        <section id="countdownScreen" class="screen">
+            <div class="countdown-wrap">
+                <span id="countdownNumber" class="countdown-number">3</span>
+                <span class="countdown-caption">Get ready to tap!</span>
+            </div>
+        </section>
+
+        <!-- ============ GAME SCREEN ============ -->
+        <section id="gameScreen" class="screen">
+            <div class="hud">
+                <div class="hud__item">
+                    <span class="hud__label">SCORE</span>
+                    <span id="scoreDisplay" class="hud__value hud__value--score">0</span>
+                </div>
+                <div class="hud__item">
+                    <span class="hud__label">TIME</span>
+                    <span id="timeDisplay" class="hud__value hud__value--time">30</span>
+                </div>
+                <div class="hud__item">
+                    <span class="hud__label">BEST</span>
+                    <span id="bestDisplay" class="hud__value hud__value--best">0</span>
+                </div>
+            </div>
+
+            <div class="progress-track">
+                <div id="progressBar" class="progress-bar"></div>
+            </div>
+
+            <div id="comboBanner" class="combo-banner">🔥 COMBO x2 ACTIVE!</div>
+
+            <div class="tap-zone">
+                <button id="tapBtn" class="tap-btn" aria-label="Tap to score">
+                    <span class="tap-btn__label">TAP!</span>
+                </button>
+                <div id="floatLayer" class="float-layer"></div>
+                <div id="particleLayer" class="particle-layer"></div>
+            </div>
+
+            <button id="pauseBtn" class="btn btn--secondary btn--small pause-btn">⏸ Pause</button>
+
+            <div id="pauseOverlay" class="pause-overlay hidden">
+                <div class="pause-card">
+                    <h2>PAUSED</h2>
+                    <button id="resumeBtn" class="btn btn--primary">Resume</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ GAME OVER SCREEN ============ -->
+        <section id="gameOverScreen" class="screen">
+            <div class="card card--gameover fade-in">
+                <h1 class="gameover-title">GAME OVER</h1>
+                <p class="gameover-final-label">Final Score</p>
+                <p id="finalScore" class="gameover-final-score">0</p>
+                <p id="newRecordTag" class="new-record-tag hidden">🎉 NEW HIGH SCORE!</p>
+
+                <div id="nameEntry" class="name-entry">
+                    <label for="playerName" class="name-entry__label">Enter your name to save your score</label>
+                    <input id="playerName" class="name-entry__input" type="text" maxlength="16"
+                        placeholder="Your name" />
+                    <button id="saveScoreBtn" class="btn btn--primary">Save Score</button>
+                </div>
+
+                <button id="playAgainBtn" class="btn btn--secondary hidden">Play Again</button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Confetti canvas overlay -->
+    <canvas id="confettiCanvas"></canvas>
+
+    <!-- Leaderboard & Stats Modal -->
+    <div id="leaderboardModal" class="modal hidden">
+        <div class="modal__card modal__card--large fade-in">
+            <button id="closeLeaderboardBtn" class="modal__close" title="Close"
+                aria-label="Close modal">&times;</button>
+
+            <div class="modal__tab-content">
+                <!-- Leaderboard -->
+                <div id="tab-leaderboard" class="tab-pane active">
+                    <div class="card__header">
+                        <h2 class="card__title">Top 10 Legends</h2>
+                        <div class="admin-btn-group">
+                            <button id="resetHighScoreBtn" class="btn btn--danger btn--small">Reset HS</button>
+                            <button id="resetLeaderboardBtn" class="btn btn--danger btn--small">Reset All</button>
+                        </div>
+                    </div>
+                    <div class="table-wrap">
+                        <table class="leaderboard-table">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Player</th>
+                                    <th>Score</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaderboardBody">
+                                <tr class="empty-row">
+                                    <td colspan="4">No scores yet. Be the first legend!</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin login modal (gates the reset) -->
+    <div id="adminModal" class="modal hidden">
+        <div class="modal__card">
+            <h3 style="color: var(--neon-blue);">🔒 Admin Access</h3>
+            <p>Enter the admin password to reset the leaderboard.</p>
+            <input id="adminPasswordInput" class="name-entry__input" type="password" placeholder="Password"
+                autocomplete="off" />
+            <p id="adminError" class="admin-error hidden">❌ Incorrect password. Try again.</p>
+            <div class="modal__actions" style="margin-top: 16px;">
+                <button id="adminCancel" class="btn btn--secondary btn--small">Cancel</button>
+                <button id="adminSubmit" class="btn btn--primary btn--small">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset confirmation modal -->
+    <div id="confirmModal" class="modal hidden">
+        <div class="modal__card">
+            <h3>Reset Leaderboard?</h3>
+            <p>This will permanently delete all saved scores. This cannot be undone.</p>
+            <div class="modal__actions">
+                <button id="confirmCancel" class="btn btn--secondary btn--small">Cancel</button>
+                <button id="confirmDelete" class="btn btn--danger btn--small">Delete All</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
